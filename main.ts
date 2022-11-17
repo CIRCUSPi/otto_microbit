@@ -1,4 +1,4 @@
-//% weight=0 color="#ff0011" icon="\uf144"
+//% weight=0 color="#ff0011" icon="\uf144" block="otto bit"
 namespace ottomicrobit {
     let L1Pin = AnalogPin.P13
     let L2Pin = AnalogPin.P14
