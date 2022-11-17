@@ -8,7 +8,7 @@
     },
     "files": [
         "README.md",
-        "otto.ts",
+        "main.ts",
         "_locales/zh/ottomicrobit-strings.json"
     ],
     "public": true
