@@ -1,0 +1,18 @@
+{
+    "ottomicrobit|block": "otto bit",
+    "ottomicrobit.moveChoose.move1|block": "前進",
+    "ottomicrobit.moveChoose.move2|block": "後退",
+    "ottomicrobit.moveChoose.move3|block": "左轉",
+    "ottomicrobit.moveChoose.move4|block": "右轉",
+    "ottomicrobit.moveChoose.move5|block": "左滑行",
+    "ottomicrobit.moveChoose.move6|block": "右滑行",
+    "ottomicrobit.actChoose.act1|block": "快樂",
+    "ottomicrobit.actChoose.act2|block": "失落",
+    "ottomicrobit.actChoose.act3|block": "拒絕",
+    "ottomicrobit.actChoose.act4|block": "挑釁",
+    "ottomicrobit.actChoose.act5|block": "打招呼",
+    "ottomicrobit.otto_init|block": "otto 初始化腳位 L1 %L1_|L2 %L2_|R1 %R1_|R2 %R2_",
+    "ottomicrobit.otto_set_stand_up|block": "otto 初始化站立角度 L1 角度 %L1A|L2 角度 %L2A|R1 角度 %R1A|R2 角度 %R2A",
+    "ottomicrobit.otto_walk|block": "otto 執行 %choose_ 次數 %step_|動作延遲 %time_",
+    "ottomicrobit.otto_action|block": "otto 動作 %choose_"
+}
