@@ -273,6 +273,10 @@ namespace ottomicrobit {
 
     //% weight=100
     //% blockId=otto_init
+    //% L1_.defl=AnalogPin.P13
+    //% L2_.defl=AnalogPin.P14
+    //% R1_.defl=AnalogPin.P15
+    //% R2_.defl=AnalogPin.P16
     //% block="otto init L1 %L1_|L2 %L2_|R1 %R1_|R2 %R2_"
     export function otto_init(L1_: AnalogPin, L2_: AnalogPin, R1_: AnalogPin, R2_: AnalogPin): void {
         L1Pin = L1_
@@ -287,6 +291,10 @@ namespace ottomicrobit {
     //% L2A.min=0 L2A.max=180
     //% R1A.min=0 R1A.max=180
     //% R2A.min=0 R2A.max=180
+    //% L1A.defl=90
+    //% L2A.defl=90
+    //% R1A.defl=90
+    //% R2A.defl=90
     //% block="otto set stand up L1 angle %L1A|L2 angle %L2A|R1 angle %R1A|R2 angle %R2A"
     export function otto_set_stand_up(L1A: number, L2A: number, R1A: number, R2A: number): void {
         o_L1 = Math.constrain(L1A, 0, 180)
@@ -302,6 +310,8 @@ namespace ottomicrobit {
 
     //% weight=80
     //% blockId=otto_move
+    //% step_.defl=2
+    //% time_.defl=10
     //% block="otto move %choose_ step %step_|delay %time_"
     export function otto_walk(choose_: moveChoose, step_: number, time_: number): void {
         if (choose_ == 1) {
@@ -317,10 +327,10 @@ namespace ottomicrobit {
             turn(step_, time_, 1)
         }
         else if (choose_ == 5) {
-            slide(step_, time_*40, 0)
+            slide(step_, time_ * 40, 0)
         }
         else {
-            slide(step_, time_*40, 1)
+            slide(step_, time_ * 40, 1)
         }
     }
 
@@ -331,4 +341,137 @@ namespace ottomicrobit {
         action(choose_)
     }
 
+    //% weight=60
+    //% blockId=ultrasonic_sensor
+    //% tx_.defl=DigitalPin.P1
+    //% rx_.defl=DigitalPin.P2
+    //% block="Ultrasonic Sensor TX %tx_ RX %rx_"
+    export function ultrasonic_sensor(tx_: DigitalPin, rx_: DigitalPin): number {
+        let distance = 0
+        pins.setPull(tx_, PinPullMode.PullNone);
+
+        pins.digitalWritePin(tx_, 0);
+        //control.waitMicros(2);
+        control.waitMicros(5);
+        pins.digitalWritePin(tx_, 1);
+        control.waitMicros(10)
+        pins.digitalWritePin(tx_, 0);
+
+        distance = pins.pulseIn(rx_, PulseValue.High)
+        return distance = Math.round(distance / 2 / 29)
+    }
+
+    let _brightness = 25
+    let neopixel_buf = pins.createBuffer(16 * 2);
+    for (let i = 0; i < 16 * 2; i++) {
+        neopixel_buf[i] = 0
+    }
+    for (let i = 0; i < 2; i++) {
+        rgb_led_clear();
+    }
+
+    //% weight=50
+    //% brightness.min=0 brightness.max=255
+    //% blockId="RGB_LED_set_brightness"
+    //% block="RGB LED set brightness to |%brightness |(0~255)"
+    export function rgb_led_set_setBrightness(brightness: number) {
+        if (brightness < 0) {
+            brightness = 0;
+        }
+        if (brightness > 255) {
+            brightness = 255;
+        }
+        _brightness = brightness;
+    }
+
+    //% weight=49
+    //% rgb.shadow="colorNumberPicker"
+    //% blockId="RGB_LED_show_all"
+    //% block="All RGB LED show color|%rgb"
+    export function rgb_led_show_all(rgb: number): void {
+        let r = (rgb >> 16) * (_brightness / 255);
+        let g = ((rgb >> 8) & 0xFF) * (_brightness / 255);
+        let b = ((rgb) & 0xFF) * (_brightness / 255);
+        for (let i = 0; i < 2; i++) {
+            neopixel_buf[i * 3 + 0] = Math.round(g)
+            neopixel_buf[i * 3 + 1] = Math.round(r)
+            neopixel_buf[i * 3 + 2] = Math.round(b)
+        }
+        ws2812b.sendBuffer(neopixel_buf, DigitalPin.P12)
+    }
+
+    //% weight=48
+    //% index.min=0 index.max=1
+    //% rgb.shadow="colorNumberPicker"
+    //% blockId="RGB_LED_show"
+    //% block="RGB LED number|%index show color|%rgb"
+    export function rgb_led_show(index: number, rgb: number): void {
+        if (index < 0) {
+            index = 0;
+        }
+        if (index > 1) {
+            index = 1;
+        }
+        let f = index;
+        let t = index;
+        let r = (rgb >> 16) * (_brightness / 255);
+        let g = ((rgb >> 8) & 0xFF) * (_brightness / 255);
+        let b = ((rgb) & 0xFF) * (_brightness / 255);
+
+        if (index > 15) {
+            if (((index >> 8) & 0xFF) == 0x02) {
+                f = index >> 16;
+                t = index & 0xff;
+            } else {
+                f = 0;
+                t = -1;
+            }
+        }
+        for (let i = f; i <= t; i++) {
+            neopixel_buf[i * 3 + 0] = Math.round(g)
+            neopixel_buf[i * 3 + 1] = Math.round(r)
+            neopixel_buf[i * 3 + 2] = Math.round(b)
+        }
+        ws2812b.sendBuffer(neopixel_buf, DigitalPin.P12)
+    }
+
+
+
+    //% weight=47
+    //% r.min=0 r.max=255
+    //% g.min=0 g.max=255
+    //% b.min=0 b.max=255
+    //% blockId="RGB_LED_set_RGB"
+    //% block="Red|%r Green|%g Blue|%b"
+    export function rgb_led_set_RGB(r: number, g: number, b: number): number {
+        if (r < 0) {
+            r = 0;
+        }
+        if (r > 255) {
+            r = 255;
+        }
+        if (g < 0) {
+            g = 0;
+        }
+        if (g > 255) {
+            g = 255;
+        }
+        if (b < 0) {
+            b = 0;
+        }
+        if (b > 255) {
+            b = 255;
+        }
+        return (r << 16) + (g << 8) + (b);
+    }
+
+    //% weight=46
+    //% blockId="RGB_LED_clear"
+    //% block="RGB LED clear all"
+    export function rgb_led_clear(): void {
+        for (let i = 0; i < 16 * 2; i++) {
+            neopixel_buf[i] = 0
+        }
+        ws2812b.sendBuffer(neopixel_buf, DigitalPin.P12)
+    }
 }
